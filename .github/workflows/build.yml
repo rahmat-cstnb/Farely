@@ -1,0 +1,61 @@
+name: Build Farely App
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron app
+        run: |
+          npm run build
+
+      - name: Zip dist folder
+        run: |
+          zip -r dist.zip dist/
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release-${{ github.sha }}-${{ matrix.os }}-${{ github.run_id }}
+          release_name: Farely Build ${{ github.sha }} ${{ matrix.os }} ${{ github.run_id }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist.zip
+          asset_name: Farely-${{ matrix.os }}-assets.zip
+          asset_content_type: application/zip
+
+      - name: Upload artifact (for workflow artifact storage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Farely-${{ matrix.os }}
+          path: dist/**
