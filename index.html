@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Farely — Toll & Fare Estimator</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    html, body, #map-container, #map {
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #map {
+      width: 100%;
+    }
+
+    #sidebar {
+      width: 320px;
+      padding: 15px;
+      background: #f5f5f5;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    #app {
+      display: flex;
+      height: 100vh;
+    }
+
+    #map-container {
+      flex: 1;
+    }
+
+    /* Style tombol dan input agar sesuai panel */
+    input[type="text"], select, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #6200ee;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+
+    .panel {
+      margin-bottom: 20px;
+    }
+
+    .suggestions {
+      background: white;
+      border: 1px solid #ddd;
+      max-height: 120px;
+      overflow-y: auto;
+      position: relative;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <header class="brand">
+        <h1>Farely</h1>
+        <p>Travel & Toll Estimator</p>
+      </header>
+
+      <section class="panel">
+        <h2>Route</h2>
+
+        <label for="pointA">Point A (Taxi Stand)</label>
+        <input id="pointA" type="text" placeholder="Type taxi stand name..." autocomplete="off" />
+        <div id="suggestA" class="suggestions"></div>
+
+        <label for="pointB">Point B (Taxi Stand)</label>
+        <input id="pointB" type="text" placeholder="Type taxi stand name..." autocomplete="off" />
+        <div id="suggestB" class="suggestions"></div>
+
+        <label for="vehicleType">Vehicle Type</label>
+        <select id="vehicleType">
+          <option value="">-- Select --</option>
+          <option value="1">Car (Class 1)</option>
+          <option value="2">Bus (Class 2)</option>
+          <option value="3">Truck (Class 3)</option>
+          <option value="4">Taxi (Class 4)</option>
+        </select>
+
+        <button id="calculateBtn">Calculate</button>
+      </section>
+
+      <section class="panel">
+        <h2>Summary</h2>
+        <div id="summary"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Receipt</h2>
+        <pre id="receipt"></pre>
+      </section>
+
+      <footer class="footer">
+        <small>© 2025 Farely</small>
+      </footer>
+    </aside>
+
+    <main id="map-container">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <!-- Mock data and app JS -->
+  <script src="js/mockData.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/app.js"></script>
+  <script src="js/autocomplete.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Panggil fungsi untuk tampilkan point plaza toll dan taxi stand di peta
+      loadAllPlazaTolls();
+      loadTaxiStands();
+    });
+  </script>
+</body>
+</html>
