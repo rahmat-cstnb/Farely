@@ -5,29 +5,46 @@ const { spawn } = require('child_process');
 const isDev = require('electron-is-dev');
 const getPort = require('get-port');
 
+process.on('uncaughtException', (error) => {
+  dialog.showErrorBox('Unexpected Error', `An unexpected error occurred:\n${error.message || error}`);
+  app.quit();
+});
+
+process.on('unhandledRejection', (reason) => {
+  dialog.showErrorBox('Unhandled Rejection', `An unhandled promise rejection occurred:\n${reason}`);
+  app.quit();
+});
+
 let backendProcess;
 
 async function createWindow(port) {
-  const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
-    },
-    icon: path.join(__dirname, 'assets', 'farely.icns')
-  });
+  try {
+    const win = new BrowserWindow({
+      width: 1280,
+      height: 800,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      },
+      icon: process.platform === 'win32'
+        ? path.join(__dirname, 'assets', 'farely.ico')
+        : path.join(__dirname, 'assets', 'farely.icns')
+    });
 
-  setTimeout(() => {
-    if (isDev) {
-      win.loadFile('index.html', { query: { port: port.toString() } });
-    } else {
-      win.loadFile(path.join(__dirname, 'index.html'), { query: { port: port.toString() } });
-    }
-  }, 1500); // Delay to ensure backend is ready
+    setTimeout(() => {
+      if (isDev) {
+        win.loadFile('index.html', { query: { port: port.toString() } });
+      } else {
+        win.loadFile(path.join(__dirname, 'index.html'), { query: { port: port.toString() } });
+      }
+    }, 1500); // Delay to ensure backend is ready
 
-  // Buka DevTools (optional)
-  // win.webContents.openDevTools();
+    // Buka DevTools (optional)
+    // win.webContents.openDevTools();
+  } catch (error) {
+    dialog.showErrorBox('Window Creation Error', `Failed to create window:\n${error.message || error}`);
+    app.quit();
+  }
 }
 
 function startBackend(port) {
@@ -48,6 +65,13 @@ function startBackend(port) {
 
     backendProcess.on('error', (err) => {
       reject(err);
+    });
+
+    backendProcess.on('exit', (code, signal) => {
+      if (code !== 0) {
+        dialog.showErrorBox('Backend Error', `Backend process exited unexpectedly with code ${code} and signal ${signal}`);
+        app.quit();
+      }
     });
 
     // Wait a short time to assume backend is ready

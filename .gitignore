@@ -1,5 +1,6 @@
-/dist/
+/ dist/
 *.dmg
 *.exe
 *.app
 node_modules/
+.DS_Store

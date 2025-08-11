@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Farely — A modern fare and toll calculator",
   "dependencies": {
     "@turf/turf": "^7.2.0",
     "cors": "^2.8.5",
@@ -41,13 +41,16 @@
     ],
     "mac": {
       "category": "public.app-category.utilities",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/farely.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/farely.ico"
     },
     "linux": {
       "target": "AppImage"
-    }
+    },
+    "publish": null
   }
 }
