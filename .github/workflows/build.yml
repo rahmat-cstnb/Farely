@@ -26,13 +26,15 @@ jobs:
         run: npm install
 
       - name: Build Electron app
-        run: |
-          export GH_TOKEN=${{ secrets.FARELY }}
-          npm run build
+        env:
+          GH_TOKEN: ${{ secrets.FARELY }}
+        run: npm run build
 
-      - name: Zip dist folder
-        run: |
-          zip -r dist.zip dist/
+      - name: Upload artifact (for workflow artifact storage)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Farely-${{ matrix.os }}
+          path: dist/
 
       - name: Create GitHub Release
         id: create_release
@@ -51,12 +53,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FARELY }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist.zip
-          asset_name: Farely-${{ matrix.os }}-assets.zip
+          asset_path: ./dist/
+          asset_name: Farely-${{ matrix.os }}-assets
           asset_content_type: application/zip
-
-      - name: Upload artifact (for workflow artifact storage)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Farely-${{ matrix.os }}
-          path: dist/**
