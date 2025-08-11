@@ -27,6 +27,7 @@ jobs:
 
       - name: Build Electron app
         run: |
+          export GH_TOKEN=${{ secrets.FARELY }}
           npm run build
 
       - name: Zip dist folder
